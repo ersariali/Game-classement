@@ -1,65 +1,165 @@
-import Image from "next/image";
+"use client";
+import { motion } from 'framer-motion';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
+  const [activeAnim, setActiveAnim] = useState<string | null>(null);
+  const router = useRouter();
+
+  const handleNavigation = (id: string, path: string) => {
+    setActiveAnim(id);
+    // On attend 1 seconde pour que la voiture traverse l'écran 
+    // ou que la planète explose avant de changer de page
+    setTimeout(() => {
+      router.push(path);
+    }, 1000);
+  };
+
+  const modes: { 
+  id: string; 
+  name: string; 
+  path: string; 
+  gradient: string; 
+  icon: string; 
+  animation: any; // On dit à TS d'être flexible ici
+}[] = [
+  { 
+    id: 'fruits', 
+    name: 'Meyveler', 
+    path: '/fruits', 
+    gradient: 'from-orange-400 to-red-500',
+    icon: "🍎",
+    animation: {
+      y: [0, -150],
+      scale: [1, 1.8, 0],
+      rotate: [0, 25, -25, 45],
+      opacity: [1, 1, 0],
+      transition: { duration: 0.8, ease: "easeOut" }
+    }
+  },
+    { 
+      id: 'cars', 
+      name: 'Arabalar', 
+      path: '/arabalar', 
+      gradient: 'from-blue-500 to-indigo-600',
+      icon: "🏎️",
+      animation: {
+        // Recul d'élan (-40) puis sprint vers la DROITE (+1500)
+        x: [0, -40, 1500], 
+        y: [0, -2, 2, -2, 0], // Vibrations moteur
+        scale: [1, 1.1, 1.4],
+        transition: { 
+          duration: 0.8, 
+          times: [0, 0.1, 1], 
+          ease: "easeIn" 
+        }
+      }
+    },
+    { 
+      id: 'cities', 
+      name: 'Şehirler', 
+      path: '/sehirler', 
+      gradient: 'from-emerald-400 to-teal-600',
+      icon: "🌍",
+      animation: {
+        scale: [1, 2, 25], // Explosion totale vers l'utilisateur
+        rotate: 720,
+        opacity: [1, 1, 0],
+        transition: { duration: 1, ease: "easeInOut" }
+      }
+    },
+  ];
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <div className="relative flex flex-col items-center justify-center min-h-screen bg-slate-50 p-6 overflow-hidden">
+      
+      {/* Titre principal */}
+      <motion.div 
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        className="mb-12 text-center"
+      >
+        <h1 className="text-5xl font-black text-slate-800 tracking-tighter">
+          SIRALAMA <span className="text-orange-500">USTASI</span>
+        </h1>
+        <p className="text-slate-400 font-medium italic">En iyisini sen seç!</p>
+      </motion.div>
+      
+      <div className="grid gap-6 w-full max-w-sm px-4">
+        {modes.map((mode) => (
+          <div 
+            key={mode.id}
+            className="relative" 
+            onClick={() => handleNavigation(mode.id, mode.path)}
+          >
+            {/* Le bouton (Cadre de sélection) */}
+            <motion.div 
+              whileTap={{ scale: 0.95 }}
+              className="relative h-28 sm:h-32 rounded-[2.5rem] shadow-xl flex items-center px-8 overflow-hidden z-10 cursor-pointer"
+            >
+              <div className={`absolute inset-0 bg-gradient-to-br ${mode.gradient}`}></div>
+              <span className="relative text-2xl font-black text-white uppercase tracking-widest z-20">
+                {mode.name}
+              </span>
+            </motion.div>
+
+            {/* L'icône (Extraite pour sortir du bouton) */}
+            <motion.span 
+              className="absolute right-8 top-1/2 -translate-y-1/2 text-6xl pointer-events-none z-50"
+              style={{ 
+                display: 'inline-block',
+                // Retourne la voiture pour qu'elle regarde à DROITE
+                scaleX: mode.id === 'cars' ? -1 : 1 
+              }}
+              animate={activeAnim === mode.id ? mode.animation : {}}
+            >
+              {activeAnim === mode.id && mode.id === 'fruits' ? "😋" : mode.icon}
+            </motion.span>
+
+            {/* Animation de fumée de démarrage (uniquement pour la voiture) */}
+            {activeAnim === 'cars' && mode.id === 'cars' && (
+  <div className="absolute right-24 top-1/2 -translate-y-1/2 flex gap-1 z-40">
+    {[1, 2, 3].map((i) => (
+      <motion.span
+        key={i}
+        className="text-3xl"
+        style={{ 
+          display: 'inline-block',
+          scaleX: -1 // On retourne l'émoji fumée pour qu'il pointe vers la gauche
+        }}
+        initial={{ scale: 0.5, opacity: 0.8 }}
+        animate={{ 
+          scale: [1, 2.5], 
+          opacity: [0.8, 0],
+          // x négatif pour que la fumée soit éjectée vers la GAUCHE
+          x: [-10, -70 * i], 
+          y: [-5, -15] 
+        }}
+        transition={{ 
+          duration: 0.8, 
+          delay: 0.05 * i,
+          ease: "easeOut"
+        }}
+      >
+        💨
+      </motion.span>
+    ))}
+  </div>
+)}
+          </div>
+        ))}
+      </div>
+
+      {/* Flash d'immersion pour les villes */}
+      {activeAnim === 'cities' && (
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.6 }}
+          className="fixed inset-0 bg-white z-[60] pointer-events-none"
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+      )}
     </div>
   );
 }

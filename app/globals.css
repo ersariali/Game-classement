@@ -1,26 +1,57 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --bg-orange: #fff7ed;
+  --bg-blue: #eff6ff;
+  --bg-green: #ecfdf5;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  font-family: sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* Empêche le défilement inutile sur mobile lors du jeu */
+  touch-action: manipulation; 
+}
+
+/* Slots de classement optimisés pour mobile */
+.rank-slot {
+  display: flex;
+  align-items: center;
+  background-color: white;
+  border-radius: 1.25rem;
+  margin-bottom: 0.75rem;
+  height: 4.5rem; /* Un peu plus grand pour le confort tactile */
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+  width: 100%; /* Prend toute la largeur disponible */
+}
+
+/* Cartes d'items optimisées */
+.item-card {
+  font-size: 2rem; 
+  width: 3.5rem;
+  height: 3.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: white;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  border: 2px solid #f3f4f6;
+  transition: all 0.2s ease;
+}
+
+/* Sur mobile, on réduit un peu la taille des emojis si besoin */
+@media (max-width: 400px) {
+  .item-card {
+    font-size: 1.75rem;
+    width: 3rem;
+    height: 3rem;
+  }
+  .rank-slot {
+    height: 4rem;
+  }
 }
