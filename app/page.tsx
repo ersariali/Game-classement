@@ -9,35 +9,34 @@ export default function Home() {
 
   const handleNavigation = (id: string, path: string) => {
     setActiveAnim(id);
-    // On attend 1 seconde pour que la voiture traverse l'écran 
-    // ou que la planète explose avant de changer de page
+    // On attend 1 seconde pour que l'animation se termine avant de changer de page
     setTimeout(() => {
       router.push(path);
     }, 1000);
   };
 
   const modes: { 
-  id: string; 
-  name: string; 
-  path: string; 
-  gradient: string; 
-  icon: string; 
-  animation: any; // On dit à TS d'être flexible ici
-}[] = [
-  { 
-    id: 'fruits', 
-    name: 'Meyveler', 
-    path: '/fruits', 
-    gradient: 'from-orange-400 to-red-500',
-    icon: "🍎",
-    animation: {
-      y: [0, -150],
-      scale: [1, 1.8, 0],
-      rotate: [0, 25, -25, 45],
-      opacity: [1, 1, 0],
-      transition: { duration: 0.8, ease: "easeOut" }
-    }
-  },
+    id: string; 
+    name: string; 
+    path: string; 
+    gradient: string; 
+    icon: string; 
+    animation: any; 
+  }[] = [
+    { 
+      id: 'fruits', 
+      name: 'Meyveler', 
+      path: '/fruits', 
+      gradient: 'from-orange-400 to-red-500',
+      icon: "🍎",
+      animation: {
+        y: [0, -150],
+        scale: [1, 1.8, 0],
+        rotate: [0, 25, -25, 45],
+        opacity: [1, 1, 0],
+        transition: { duration: 0.8, ease: "easeOut" }
+      }
+    },
     { 
       id: 'cars', 
       name: 'Arabalar', 
@@ -45,9 +44,8 @@ export default function Home() {
       gradient: 'from-blue-500 to-indigo-600',
       icon: "🏎️",
       animation: {
-        // Recul d'élan (-40) puis sprint vers la DROITE (+1500)
         x: [0, -40, 1500], 
-        y: [0, -2, 2, -2, 0], // Vibrations moteur
+        y: [0, -2, 2, -2, 0], 
         scale: [1, 1.1, 1.4],
         transition: { 
           duration: 0.8, 
@@ -63,7 +61,7 @@ export default function Home() {
       gradient: 'from-emerald-400 to-teal-600',
       icon: "🌍",
       animation: {
-        scale: [1, 2, 25], // Explosion totale vers l'utilisateur
+        scale: [1, 2, 25], 
         rotate: 720,
         opacity: [1, 1, 0],
         transition: { duration: 1, ease: "easeInOut" }
@@ -93,7 +91,7 @@ export default function Home() {
             className="relative" 
             onClick={() => handleNavigation(mode.id, mode.path)}
           >
-            {/* Le bouton (Cadre de sélection) */}
+            {/* Le bouton */}
             <motion.div 
               whileTap={{ scale: 0.95 }}
               className="relative h-28 sm:h-32 rounded-[2.5rem] shadow-xl flex items-center px-8 overflow-hidden z-10 cursor-pointer"
@@ -104,12 +102,11 @@ export default function Home() {
               </span>
             </motion.div>
 
-            {/* L'icône (Extraite pour sortir du bouton) */}
+            {/* L'icône animée */}
             <motion.span 
               className="absolute right-8 top-1/2 -translate-y-1/2 text-6xl pointer-events-none z-50"
               style={{ 
                 display: 'inline-block',
-                // Retourne la voiture pour qu'elle regarde à DROITE
                 scaleX: mode.id === 'cars' ? -1 : 1 
               }}
               animate={activeAnim === mode.id ? mode.animation : {}}
@@ -117,41 +114,37 @@ export default function Home() {
               {activeAnim === mode.id && mode.id === 'fruits' ? "😋" : mode.icon}
             </motion.span>
 
-            {/* Animation de fumée de démarrage (uniquement pour la voiture) */}
+            {/* Effet de fumée pour la voiture */}
             {activeAnim === 'cars' && mode.id === 'cars' && (
-  <div className="absolute right-24 top-1/2 -translate-y-1/2 flex gap-1 z-40">
-    {[1, 2, 3].map((i) => (
-      <motion.span
-        key={i}
-        className="text-3xl"
-        style={{ 
-          display: 'inline-block',
-          scaleX: -1 // On retourne l'émoji fumée pour qu'il pointe vers la gauche
-        }}
-        initial={{ scale: 0.5, opacity: 0.8 }}
-        animate={{ 
-          scale: [1, 2.5], 
-          opacity: [0.8, 0],
-          // x négatif pour que la fumée soit éjectée vers la GAUCHE
-          x: [-10, -70 * i], 
-          y: [-5, -15] 
-        }}
-        transition={{ 
-          duration: 0.8, 
-          delay: 0.05 * i,
-          ease: "easeOut"
-        }}
-      >
-        💨
-      </motion.span>
-    ))}
-  </div>
-)}
+              <div className="absolute right-24 top-1/2 -translate-y-1/2 flex gap-1 z-40">
+                {[1, 2, 3].map((i) => (
+                  <motion.span
+                    key={i}
+                    className="text-3xl"
+                    style={{ display: 'inline-block', scaleX: -1 }}
+                    initial={{ scale: 0.5, opacity: 0.8 }}
+                    animate={{ 
+                      scale: [1, 2.5], 
+                      opacity: [0.8, 0],
+                      x: [-10, -70 * i], 
+                      y: [-5, -15] 
+                    }}
+                    transition={{ 
+                      duration: 0.8, 
+                      delay: 0.05 * i,
+                      ease: "easeOut"
+                    }}
+                  >
+                    💨
+                  </motion.span>
+                ))}
+              </div>
+            )}
           </div>
         ))}
       </div>
 
-      {/* Flash d'immersion pour les villes */}
+      {/* Flash pour l'explosion des villes */}
       {activeAnim === 'cities' && (
         <motion.div 
           initial={{ opacity: 0 }}
@@ -163,5 +156,4 @@ export default function Home() {
     </div>
   );
 }
-// Force redeploy v2
 
